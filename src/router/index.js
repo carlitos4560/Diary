@@ -4,9 +4,11 @@ import Login from '@/views/Login'
 import Diary from '@/views/Diary'
 import Register from '@/views/Register'
 
+import store from '../store'
+import firebase from 'firebase'
 Vue.use(Router)
 
-export default new Router({
+let router = new Router({
   routes: [
     {
       path: '/',
@@ -25,3 +27,16 @@ export default new Router({
     }
   ]
 })
+router.beforeEach((to, from, next) => {
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      store.state.userUid = user.uid
+      if (router.currentRoute.name === 'login') next('Diary')
+    } else {
+    }
+  })
+  to.matched.some(record => record.meta.requiresAuth)
+  if (!store.state.login === false) next()
+  else next()
+})
+export default router
